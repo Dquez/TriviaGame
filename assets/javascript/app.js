@@ -1,8 +1,10 @@
 $(document).ready(function() {
     // Global Variables
     $("#question-div").hide();
+    $("#question-answers").hide();
 
-    var questionCount = 0;
+
+    
     var incorrectAnswers;
     var correctAnswers;
     var intervalId;
@@ -22,6 +24,8 @@ $(document).ready(function() {
         answers: ["You", "The Pilot", "Married Couples", "Your Mother"],
         correctIndex: 2
     }
+
+
     var q2 = {
         question: "What is big and yellow and comes in the morning, to brighten mom's day?",
         answers: ["School Bus", "Your Smile", "The Sun", "Big Bird"],
@@ -72,7 +76,8 @@ $(document).ready(function() {
     var questionsArray = [q1, q2, q3, q4, q5, q6, q7, q8, q9, q10];
 
 
-
+    var questionCount = 0;
+    // var index = questionsArray[questionCount].correctIndex;
 
 
 
@@ -114,7 +119,7 @@ $(document).ready(function() {
         '<iframe src="https://giphy.com/embed/26tPoyDhjiJ2g7rEs" width="480" height="360" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>';
     var finishedGif =
         '<iframe src="https://giphy.com/embed/t9ctG5MZhyyU8" width="480" height="474" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>';
-
+    var gifsArray = [gif1, gif2, gif3, gif4, gif5, gif6, gif7, gif8, gif9, gif10];
     // $("#first").hide();
     // $("#second").hide();
     // $("#first").hide();
@@ -130,61 +135,128 @@ $(document).ready(function() {
     // $("#firstGif").append();
     // Functions
 
+    // var questCounter = 0;
 
-    function generateQuestion() {
-       $("#question-div").show();
+    // function generateQuestion() {
 
-        for (var i = 0; i < questionsArray.length; i++) {
-            
+
+    // for (var i = 0; i < questionsArray.length; i++) {
+
+    //     $("#question-answers").append(
+    //         "<div class='text-center question'>" +
+    //         questionsArray[i].question +
+    //         "</div>"
+    //     );
+
+    //     // Where to hide question-answers[i > current iteration]
+    //     for (var j = 0; j < 4; j++) {
+    //        $("#question-div").show() ;
+    //         $("#question-answers").append(
+    //             "<div class='answer text-center' id='answer-" +
+    //             j +
+    //             "'data-answer-index= " +
+    //             j +
+    //             ">" +
+    //             questionsArray[i].answers[j] +
+    //             "</div>"
+    //         );
+    //     }
+    // }
+    // }
+
+    // TODO Fix timer to stop at 0, change between quesitons, set up clicking event on answers
+
+    // set question index to 0 (i=0)
+    // start: display question i
+    // set interval at 30 seconds
+    // if they choose an answer
+    // after 30 seconds
+    // tell them if they got it right
+    // increment i
+    // go to start
+
+    // Main Process
+    $("#start").on("click", function() {
+        $("#intro").hide();
+        // intervalId = setInterval(stopwatch.count, 1000);
+        // stopwatch.count(); $(this).data("answerIndex") gameRandom.indexOf(userInput) > -1
+
+
+        function start() {
+            intervalId = setInterval(stopwatch.count, 100);
+
+            $("#question-div").show();
+            $("#question-answers").show();
             $("#question-answers").append(
                 "<div class='text-center question'>" +
-                questionsArray[i].question +
+                questionsArray[questionCount].question +
                 "</div>"
             );
-            // Where to hide question-answers[i > current iteration]
-            for (var j = 0; j < questionsArray[i].answers.length; j++) {
+            for (var j = 0; j < 4; j++) {
                 $("#question-answers").append(
                     "<div class='answer text-center' id='answer-" +
                     j +
                     "'data-answer-index= " +
                     j +
                     ">" +
-                    questionsArray[i].answers[j] +
+                    questionsArray[questionCount].answers[j] +
                     "</div>"
                 );
             }
         }
-    }
+        start();
+        var questionInterval = setInterval(generateQuestion, 4600);
 
-   // TODO Fix timer to stop at 0, change between quesitons, set up clicking event on answers
+
+        function generateQuestion() {
+            
+            $("#question-answers").html("");
+            
+            $("#question-answers").append("<div class='text-center question'>The correct answer is " + questionsArray[questionCount].answers[questionsArray[questionCount].correctIndex] + "</div>");
+            $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
+            questionCount++;
+            console.log(questionCount);
+            
+            setTimeout(function() {
+                // $("#question-answers").empty();
+
+                stopwatch.reset();
+                start();
+
+            }, 5000);
+        }
+        
+        if (questionCount === 10) {
+            clearInterval(questionInterval);
+        }
 
 
-    // Main Process
-    $("#start").on("click", function() {
-        intervalId = setInterval(stopwatch.count, 1000);
-        // stopwatch.count(); $(this).data("answerIndex") gameRandom.indexOf(userInput) > -1
-        generateQuestion();
-        console.log(this);
-        $("body").on("click", ".answer", function() {
-            if ($(this).data("answer-index") === $(this).correctIndex) {
-                console.log(this);
-                clearInterval(intervalId);
-                $("#question-answers").empty();
-                $("#question-answers").append("<div class='text-center question'>Correct!</div>)");
-                $("#question-answers").append(gif1);
-                setTimeout(function() {
-                    $(this).hide();
-                }, 5000);
-            } else if ($(".answer").on("click").indexOf(questionsArray[i].correctIndex) == -1 || stopwatch.time === -1) {
-                clearInterval(intervalId);
-                $("#question-answers").empty();
-                $("#question-answers").append("<div class='text-center question'>Sorry, the correct answer was this.data-index </div>)");
-                $("#question-answers").append(gif1);
-                setTimeout(function() {
-                    $(this).hide();
-                }, 5000);
-            }
-        });
+        // questionCount++;
+        //     start();
+
+
+        // generateQuestion();
+        // console.log(this);
+        // $("body").on("click", ".answer", function() {
+        //     if ($(this).data("answer-index") === $(this).correctIndex) {
+        //         console.log(this);
+        //         clearInterval(intervalId);
+        //         $("#question-answers").empty();
+        //         $("#question-answers").append("<div class='text-center question'>Correct!</div>)");
+        //         $("#question-answers").append(gif1);
+        //         setTimeout(function() {
+        //             $(this).hide();
+        //         }, 5000);
+        //     } else if ($(".answer").on("click").indexOf(questionsArray[i].correctIndex) == -1 || stopwatch.time === -1) {
+        //         clearInterval(intervalId);
+        //         $("#question-answers").empty();
+        //         $("#question-answers").append("<div class='text-center question'>Sorry, the correct answer was this.data-index </div>)");
+        //         $("#question-answers").append(gif1);
+        //         setTimeout(function() {
+        //             $(this).hide();
+        //         }, 5000);
+        //     }
+        // });
     });
 
     //  The timer object.
@@ -196,13 +268,10 @@ $(document).ready(function() {
             stopwatch.time = 45;
             $(".time-left").html(stopwatch.time);
             clearInterval(intervalId);
-
-            stopwatch.start();
+            // stopwatch.start();
             // stopwatch.questionCount = 0;
         },
 
-        // start: function() {
-        //         ,
         newQuestion: function() {
             clearInterval(intervalId);
         },
@@ -210,16 +279,16 @@ $(document).ready(function() {
         count: function() {
             var converted = stopwatch.timeConverter(stopwatch.time);
             timeCoverted = converted;
-            $("#intro").hide();
+            // $("#intro").hide();
             stopwatch.time--;
             $(".time-left").html(converted);
+            console.log(stopwatch.time);
+            if (stopwatch.time === -1) {
+                clearInterval(intervalId);
+            }
+
         },
-        // } else {
-        //     stopwatch.time--;
-        //     console.log(stopwatch.time);
-        //     $(".time-left").html(converted);
-        // }
-        // },
+
 
         timeConverter: function(t) {
             if (t < 10) {
