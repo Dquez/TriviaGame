@@ -120,6 +120,7 @@ $(document).ready(function() {
     // Main Process
 
     function newQuestAtStart() {
+        $("#time-restart").show();
         stopwatch.reset();
         intervalId = setInterval(stopwatch.count, 1000);
         console.log("quest count is " + questionCount);
@@ -143,60 +144,47 @@ $(document).ready(function() {
             );
         }
     }
-    if (questionCount == 9) {
-        $("#question-answers").html("");
-        clearInterval(intervalId);
-        $("#question-answers").text("<div class='text-center question'>You got " + correctGuesses + "out of 10. Do you want to play again? </div>");
-        $("#question-answers").append("<button class='btn btn-lg btn-primary' id='replay'>Play again?</button>");
-        $("#replay").on("click", function() {
-            questionCount = 0;
-            newQuestAtStart();
 
+    $("#start").on("click", function() {
+        $("#intro").hide();
+
+
+
+        newQuestAtStart();
+        stopwatch.reset();
+        intervalId = setInterval(stopwatch.count, 1000);
+        // newQ();
+        $("body").on("click", ".answer", function() {
+            if ($(this).attr("data-answer-index") == questionsArray[questionCount].correctIndex) {
+                clearInterval(intervalId);
+                $("#question-answers").html("");
+                $("#question-answers").append("<div class='text-center question'>Nice! You got it right!</div>");
+                $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
+                questionCount++;
+                correctGuesses++;
+                setTimeout(function() {
+                    newQuestAtStart();
+                }, 5000);
+                return;
+
+
+            } else {
+                clearInterval(intervalId);
+                $("#question-answers").html("");
+                $("#question-answers").append("<div class='text-center question'>Sorry, the correct answer is " + questionsArray[questionCount].answers[questionsArray[questionCount].correctIndex] + "</div>");
+                $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
+                questionCount++;
+                incorrectGuesses++;
+                setTimeout(function() {
+                    newQuestAtStart();
+                }, 5000);
+                return;
+            }
         });
-    } else {
-
-        $("#start").on("click", function() {
-            $("#intro").hide();
 
 
+    });
 
-            newQuestAtStart();
-            stopwatch.reset();
-            intervalId = setInterval(stopwatch.count, 1000);
-            // newQ();
-            $("body").on("click", ".answer", function() {
-                if ($(this).attr("data-answer-index") == questionsArray[questionCount].correctIndex) {
-                    clearInterval(intervalId);
-                    $("#question-answers").html("");
-                    $("#question-answers").append("<div class='text-center question'>Nice! You got it right!</div>");
-                    $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
-                    questionCount++;
-                    correctGuesses++;
-                    console.log("Correct: " + correctGuesses);
-                    setTimeout(function() {
-                        newQuestAtStart();
-                    }, 3000);
-                    return;
-
-
-                } else {
-                    clearInterval(intervalId);
-                    $("#question-answers").html("");
-                    $("#question-answers").append("<div class='text-center question'>Sorry, the correct answer is " + questionsArray[questionCount].answers[questionsArray[questionCount].correctIndex] + "</div>");
-                    $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
-                    questionCount++;
-                    incorrectGuesses++;
-                    console.log("Incorrect: " + incorrectGuesses);
-                    setTimeout(function() {
-                        newQuestAtStart();
-                    }, 3000);
-                    return;
-                }
-            });
-
-
-        });
-    }
 
     //  The timer object.
     var stopwatch = {
@@ -215,25 +203,39 @@ $(document).ready(function() {
         },
 
         count: function() {
-            var converted = stopwatch.timeConverter(stopwatch.time);
-            timeCoverted = converted;
-            stopwatch.time--;
-            $(".time-left").html(converted);
-            console.log(stopwatch.time);
-            // The other logic that says when time is up, we switch to a third condition (opposed to the clicked right and clicked wrong conditions)
-            if (stopwatch.time === -1) {
-                clearInterval(intervalId);
+            if (questionCount == 10) {
                 $("#question-answers").html("");
-                $("#question-answers").append("<div class='text-center question'>Time's up! The correct answer is " + questionsArray[questionCount].answers[questionsArray[questionCount].correctIndex] + "</div>");
-                $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
-                questionCount++;
-                unanswered++;
-                setTimeout(function() {
+                clearInterval(intervalId);
+                $("#time-restart").hide();
+                $("#question-answers").html("<div class='text-center question'>You scored " + correctGuesses + " out of 10. Do you want to play again? </div>");
+                $("#question-answers").append("<button class='col-md-4 col-md-offset-4 btn btn-primary btn-lg' id='replay'>Play again?</button>");
+                $("#replay").on("click", function() {
+                    questionCount = 0;
+                    correctGuesses = 0;
+                    incorrectGuesses = 0;
                     newQuestAtStart();
-                }, 3000);
-                console.log(questionCount);
-            }
 
+                });
+            } else {
+                var converted = stopwatch.timeConverter(stopwatch.time);
+                timeCoverted = converted;
+                stopwatch.time--;
+                $(".time-left").html(converted);
+                console.log(stopwatch.time);
+                // The other logic that says when time is up, we switch to a third condition (opposed to the clicked right and clicked wrong conditions)
+                if (stopwatch.time === -1) {
+                    clearInterval(intervalId);
+                    $("#question-answers").html("");
+                    $("#question-answers").append("<div class='text-center question'>Time's up! The correct answer is " + questionsArray[questionCount].answers[questionsArray[questionCount].correctIndex] + "</div>");
+                    $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
+                    questionCount++;
+                    unanswered++;
+                    setTimeout(function() {
+                        newQuestAtStart();
+                    }, 5000);
+                    console.log(questionCount);
+                }
+            }
 
         },
 
