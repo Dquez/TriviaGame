@@ -11,10 +11,12 @@ $(document).ready(function() {
 
     //prevents the clock from being sped up unnecessarily
     var clockRunning = false;
-    var count;
+
     var timeConverted;
     var gameLock = true;
-
+    var correctGuesses = 0;
+    var incorrectGuesses = 0;
+    var unanswered = 0;
 
 
     //     Each question written as an object
@@ -117,69 +119,11 @@ $(document).ready(function() {
 
     // Main Process
 
-
-
-    // I need to some how prevent the questions from populating the div tag before I click start.
-
-    $("#start").on("click", function() {
-        $("#intro").hide();
-        intervalId = setInterval(stopwatch.count, 1000);
-
-        $("#question-div").show();
-        $("#question-answers").show();
-        $("#question-answers").append(
-            "<div class='text-center question'>" +
-            questionsArray[questionCount].question +
-            "</div>"
-        );
-        for (var j = 0; j < 4; j++) {
-            $("#question-answers").append(
-                "<div class='answer text-center' id='answer-" +
-                j +
-                "'data-answer-index= " +
-                j +
-                ">" +
-                questionsArray[questionCount].answers[j] +
-                "</div>"
-            );
-        }
-        $("body").on("click", ".answer", function() {
-            if ($(this).attr("data-answer-index") == questionsArray[questionCount].correctIndex) {
-                clearInterval(intervalId);
-                $("#question-answers").html("");
-                $("#question-answers").append("<div class='text-center question'>Nice! You got it right!</div>");
-                $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
-                // setTimeout(function() {
-                questionCount++;
-                return;
-                // }, 5000);
-                // Not sure how I could get out of the current loop once I click a wrong or right answer other than waiting out the time limit.
-
-            } else {
-                clearInterval(intervalId);
-                $("#question-answers").html("");
-                $("#question-answers").append("<div class='text-center question'>Sorry, the correct answer is " + questionsArray[questionCount].answers[questionsArray[questionCount].correctIndex] + "</div>");
-                $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
-
-                // setTimeout(function() {
-                questionCount++;
-                return;
-                // }, 5000);
-                // Not sure how I could get out of the current loop once I click a wrong or right answer other than waiting out the time limit.
-
-
-            }
-        });
-
-    });
-
-
-
-
-    var questionInterval = setInterval(function() {
-        $("#question-answers").empty();
+    function newQuestAtStart() {
         stopwatch.reset();
         intervalId = setInterval(stopwatch.count, 1000);
+        console.log("quest count is " + questionCount);
+        $("#question-answers").html("");
         $("#question-div").show();
         $("#question-answers").show();
         $("#question-answers").append(
@@ -198,20 +142,72 @@ $(document).ready(function() {
                 "</div>"
             );
         }
+    }
+    if (questionCount == 9) {
+        $("#question-answers").html("");
+        clearInterval(intervalId);
+        $("#question-answers").text("<div class='text-center question'>You got " + correctGuesses + "out of 10. Do you want to play again? </div>");
+        $("#question-answers").append("<button class='btn btn-lg btn-primary' id='replay'>Play again?</button>");
+        $("#replay").on("click", function() {
+            questionCount = 0;
+            newQuestAtStart();
 
-    }, 37000);
+        });
+    } else {
+
+        $("#start").on("click", function() {
+            $("#intro").hide();
+
+
+
+            newQuestAtStart();
+            stopwatch.reset();
+            intervalId = setInterval(stopwatch.count, 1000);
+            // newQ();
+            $("body").on("click", ".answer", function() {
+                if ($(this).attr("data-answer-index") == questionsArray[questionCount].correctIndex) {
+                    clearInterval(intervalId);
+                    $("#question-answers").html("");
+                    $("#question-answers").append("<div class='text-center question'>Nice! You got it right!</div>");
+                    $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
+                    questionCount++;
+                    correctGuesses++;
+                    console.log("Correct: " + correctGuesses);
+                    setTimeout(function() {
+                        newQuestAtStart();
+                    }, 3000);
+                    return;
+
+
+                } else {
+                    clearInterval(intervalId);
+                    $("#question-answers").html("");
+                    $("#question-answers").append("<div class='text-center question'>Sorry, the correct answer is " + questionsArray[questionCount].answers[questionsArray[questionCount].correctIndex] + "</div>");
+                    $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
+                    questionCount++;
+                    incorrectGuesses++;
+                    console.log("Incorrect: " + incorrectGuesses);
+                    setTimeout(function() {
+                        newQuestAtStart();
+                    }, 3000);
+                    return;
+                }
+            });
+
+
+        });
+    }
 
     //  The timer object.
     var stopwatch = {
         time: 30,
-        // questionCount: 0,
+
 
         reset: function() {
             stopwatch.time = 30;
             $(".time-left").html(stopwatch.time);
             clearInterval(intervalId);
-            // stopwatch.start();
-            // stopwatch.questionCount = 0;
+
         },
 
         newQuestion: function() {
@@ -221,7 +217,6 @@ $(document).ready(function() {
         count: function() {
             var converted = stopwatch.timeConverter(stopwatch.time);
             timeCoverted = converted;
-            // $("#intro").hide();
             stopwatch.time--;
             $(".time-left").html(converted);
             console.log(stopwatch.time);
@@ -232,6 +227,10 @@ $(document).ready(function() {
                 $("#question-answers").append("<div class='text-center question'>Time's up! The correct answer is " + questionsArray[questionCount].answers[questionsArray[questionCount].correctIndex] + "</div>");
                 $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
                 questionCount++;
+                unanswered++;
+                setTimeout(function() {
+                    newQuestAtStart();
+                }, 3000);
                 console.log(questionCount);
             }
 
