@@ -4,7 +4,7 @@ $(document).ready(function() {
     $("#question-answers").hide();
 
 
-    
+
     var incorrectAnswers;
     var correctAnswers;
     var intervalId;
@@ -13,7 +13,7 @@ $(document).ready(function() {
     var clockRunning = false;
     var count;
     var timeConverted;
-
+    var gameLock = true;
 
 
 
@@ -74,24 +74,8 @@ $(document).ready(function() {
 
     // The array of question objects 
     var questionsArray = [q1, q2, q3, q4, q5, q6, q7, q8, q9, q10];
-
-
+    // The number of q object (question in the trivia game) I'm on
     var questionCount = 0;
-    // var index = questionsArray[questionCount].correctIndex;
-
-
-
-    // setTimeout(nextQuestion, 5000);
-
-
-    // $("button").on(
-    //     "click",
-    //     function() {
-    //         var person = $(this).attr("data-person");
-    //         stopwatch.questionCount++;
-    //     },
-    //     5000
-    // );
 
 
 
@@ -120,51 +104,7 @@ $(document).ready(function() {
     var finishedGif =
         '<iframe src="https://giphy.com/embed/t9ctG5MZhyyU8" width="480" height="474" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>';
     var gifsArray = [gif1, gif2, gif3, gif4, gif5, gif6, gif7, gif8, gif9, gif10];
-    // $("#first").hide();
-    // $("#second").hide();
-    // $("#first").hide();
-    // $("#third").hide();
-    // $("#fourth").hide();
-    // $("#fifth").hide();
-    // $("#sixth").hide();
-    // $("#seventh").hide();
-    // $("#eighth").hide();
-    // $("#ninth").hide();
-    // $("#tenth").hide();
 
-    // $("#firstGif").append();
-    // Functions
-
-    // var questCounter = 0;
-
-    // function generateQuestion() {
-
-
-    // for (var i = 0; i < questionsArray.length; i++) {
-
-    //     $("#question-answers").append(
-    //         "<div class='text-center question'>" +
-    //         questionsArray[i].question +
-    //         "</div>"
-    //     );
-
-    //     // Where to hide question-answers[i > current iteration]
-    //     for (var j = 0; j < 4; j++) {
-    //        $("#question-div").show() ;
-    //         $("#question-answers").append(
-    //             "<div class='answer text-center' id='answer-" +
-    //             j +
-    //             "'data-answer-index= " +
-    //             j +
-    //             ">" +
-    //             questionsArray[i].answers[j] +
-    //             "</div>"
-    //         );
-    //     }
-    // }
-    // }
-
-    // TODO Fix timer to stop at 0, change between quesitons, set up clicking event on answers
 
     // set question index to 0 (i=0)
     // start: display question i
@@ -176,96 +116,98 @@ $(document).ready(function() {
     // go to start
 
     // Main Process
+
+
+
+    // I need to some how prevent the questions from populating the div tag before I click start.
+
     $("#start").on("click", function() {
         $("#intro").hide();
-        // intervalId = setInterval(stopwatch.count, 1000);
-        // stopwatch.count(); $(this).data("answerIndex") gameRandom.indexOf(userInput) > -1
+        intervalId = setInterval(stopwatch.count, 1000);
 
-
-        function start() {
-            intervalId = setInterval(stopwatch.count, 100);
-
-            $("#question-div").show();
-            $("#question-answers").show();
+        $("#question-div").show();
+        $("#question-answers").show();
+        $("#question-answers").append(
+            "<div class='text-center question'>" +
+            questionsArray[questionCount].question +
+            "</div>"
+        );
+        for (var j = 0; j < 4; j++) {
             $("#question-answers").append(
-                "<div class='text-center question'>" +
-                questionsArray[questionCount].question +
+                "<div class='answer text-center' id='answer-" +
+                j +
+                "'data-answer-index= " +
+                j +
+                ">" +
+                questionsArray[questionCount].answers[j] +
                 "</div>"
             );
-            for (var j = 0; j < 4; j++) {
-                $("#question-answers").append(
-                    "<div class='answer text-center' id='answer-" +
-                    j +
-                    "'data-answer-index= " +
-                    j +
-                    ">" +
-                    questionsArray[questionCount].answers[j] +
-                    "</div>"
-                );
+        }
+        $("body").on("click", ".answer", function() {
+            if ($(this).attr("data-answer-index") == questionsArray[questionCount].correctIndex) {
+                clearInterval(intervalId);
+                $("#question-answers").html("");
+                $("#question-answers").append("<div class='text-center question'>Nice! You got it right!</div>");
+                $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
+                // setTimeout(function() {
+                questionCount++;
+                return;
+                // }, 5000);
+                // Not sure how I could get out of the current loop once I click a wrong or right answer other than waiting out the time limit.
+
+            } else {
+                clearInterval(intervalId);
+                $("#question-answers").html("");
+                $("#question-answers").append("<div class='text-center question'>Sorry, the correct answer is " + questionsArray[questionCount].answers[questionsArray[questionCount].correctIndex] + "</div>");
+                $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
+
+                // setTimeout(function() {
+                questionCount++;
+                return;
+                // }, 5000);
+                // Not sure how I could get out of the current loop once I click a wrong or right answer other than waiting out the time limit.
+
+
             }
-        }
-        start();
-        var questionInterval = setInterval(generateQuestion, 4600);
+        });
 
-
-        function generateQuestion() {
-            
-            $("#question-answers").html("");
-            
-            $("#question-answers").append("<div class='text-center question'>The correct answer is " + questionsArray[questionCount].answers[questionsArray[questionCount].correctIndex] + "</div>");
-            $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
-            questionCount++;
-            console.log(questionCount);
-            
-            setTimeout(function() {
-                // $("#question-answers").empty();
-
-                stopwatch.reset();
-                start();
-
-            }, 5000);
-        }
-        
-        if (questionCount === 10) {
-            clearInterval(questionInterval);
-        }
-
-
-        // questionCount++;
-        //     start();
-
-
-        // generateQuestion();
-        // console.log(this);
-        // $("body").on("click", ".answer", function() {
-        //     if ($(this).data("answer-index") === $(this).correctIndex) {
-        //         console.log(this);
-        //         clearInterval(intervalId);
-        //         $("#question-answers").empty();
-        //         $("#question-answers").append("<div class='text-center question'>Correct!</div>)");
-        //         $("#question-answers").append(gif1);
-        //         setTimeout(function() {
-        //             $(this).hide();
-        //         }, 5000);
-        //     } else if ($(".answer").on("click").indexOf(questionsArray[i].correctIndex) == -1 || stopwatch.time === -1) {
-        //         clearInterval(intervalId);
-        //         $("#question-answers").empty();
-        //         $("#question-answers").append("<div class='text-center question'>Sorry, the correct answer was this.data-index </div>)");
-        //         $("#question-answers").append(gif1);
-        //         setTimeout(function() {
-        //             $(this).hide();
-        //         }, 5000);
-        //     }
-        // });
     });
+
+
+
+
+    var questionInterval = setInterval(function() {
+        $("#question-answers").empty();
+        stopwatch.reset();
+        intervalId = setInterval(stopwatch.count, 1000);
+        $("#question-div").show();
+        $("#question-answers").show();
+        $("#question-answers").append(
+            "<div class='text-center question'>" +
+            questionsArray[questionCount].question +
+            "</div>"
+        );
+        for (var j = 0; j < 4; j++) {
+            $("#question-answers").append(
+                "<div class='answer text-center' id='answer-" +
+                j +
+                "'data-answer-index= " +
+                j +
+                ">" +
+                questionsArray[questionCount].answers[j] +
+                "</div>"
+            );
+        }
+
+    }, 37000);
 
     //  The timer object.
     var stopwatch = {
-        time: 45,
+        time: 30,
         // questionCount: 0,
 
         reset: function() {
-            stopwatch.time = 45;
+            stopwatch.time = 30;
             $(".time-left").html(stopwatch.time);
             clearInterval(intervalId);
             // stopwatch.start();
@@ -283,9 +225,16 @@ $(document).ready(function() {
             stopwatch.time--;
             $(".time-left").html(converted);
             console.log(stopwatch.time);
+            // The other logic that says when time is up, we switch to a third condition (opposed to the clicked right and clicked wrong conditions)
             if (stopwatch.time === -1) {
                 clearInterval(intervalId);
+                $("#question-answers").html("");
+                $("#question-answers").append("<div class='text-center question'>Time's up! The correct answer is " + questionsArray[questionCount].answers[questionsArray[questionCount].correctIndex] + "</div>");
+                $("#question-answers").append("<div class='text-center'>" + gifsArray[questionCount] + "</div>");
+                questionCount++;
+                console.log(questionCount);
             }
+
 
         },
 
