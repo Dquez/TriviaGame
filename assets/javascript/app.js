@@ -1,4 +1,33 @@
 $(document).ready(function() {
+
+
+// This was borrowed code I found on codepen
+// number of drops created.
+var nbDrop = 858; 
+
+// function to generate a random number range.
+function randRange( minNum, maxNum) {
+  return (Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum);
+}
+
+// function to generate drops
+function createRain() {
+
+  for( i=1;i<nbDrop;i++) {
+  var dropLeft = randRange(0,1600);
+  var dropTop = randRange(-1000,1400);
+
+  $('.rain').append('<div class="drop" id="drop'+i+'"></div>');
+  $('#drop'+i).css('left',dropLeft);
+  $('#drop'+i).css('top',dropTop);
+  }
+
+}
+// Make it rain
+createRain();
+
+
+
     // Global Variables
     $("#question-div").hide();
     $("#question-answers").hide();
@@ -123,7 +152,6 @@ $(document).ready(function() {
         $("#time-restart").show();
         stopwatch.reset();
         intervalId = setInterval(stopwatch.count, 1000);
-        console.log("quest count is " + questionCount);
         $("#question-answers").html("");
         $("#question-div").show();
         $("#question-answers").show();
@@ -134,7 +162,7 @@ $(document).ready(function() {
         );
         for (var j = 0; j < 4; j++) {
             $("#question-answers").append(
-                "<div class='answer text-center' id='answer-" +
+                "<div class='answer text-center col-md-4 col-md-offset-4' id='answer-" +
                 j +
                 "'data-answer-index= " +
                 j +
